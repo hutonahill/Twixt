@@ -1,5 +1,4 @@
 ﻿using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -8,14 +7,14 @@ using TwixtCode;
 
 namespace Twixt;
 
-public partial class MainWindowClass : Window
+public partial class MainWindow : Window
 {
     // Define the list of points
         private List<Point> points = new List<Point>();
 
-        private const double CellSize = 30;
-        private const int Rows = 24;
-        private const int Cols = 24;
+        public static readonly double CellSize = 30;
+        public static readonly uint NumRows  = 24;
+        public static readonly uint NumCols = 24;
         
         private DispatcherTimer timer;
 
@@ -32,16 +31,20 @@ public partial class MainWindowClass : Window
         
         private List<UIElement> Pieces = new List<UIElement>();
 
-        public MainWindowClass()
-        {
+        public MainWindow() {
             InitializeComponent();  // Initializes components from XAML
             
-            timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromMilliseconds(33); // 30 FPS = 33ms per frame
+            timer = new DispatcherTimer {
+                Interval = TimeSpan.FromMilliseconds(33) // 30 FPS = 33ms per frame
+            };
             timer.Tick += Timer_Tick; // Event handler for each timer tick
             timer.Start();
             
             DrawGrid();
+        }
+
+        public Point? getPoint(int row, int column) {
+            return points.FirstOrDefault(p => p.getRow() == row && p.getColumn() == column);
         }
         
         private void Timer_Tick(object? sender, EventArgs e)
@@ -53,11 +56,10 @@ public partial class MainWindowClass : Window
         }
 
         private void DrawGrid() {
-            Board.Width = Cols * CellSize;
-            Board.Height = Rows * CellSize;
+            Board.Width = NumCols * CellSize;
+            Board.Height = NumRows * CellSize;
             
-            Rectangle background = new Rectangle
-            {
+            Rectangle background = new Rectangle {
                 Width = Board.Width,
                 Height = Board.Height,
                 Fill = Brushes.White
@@ -68,12 +70,12 @@ public partial class MainWindowClass : Window
             points.Clear();  // Clear any existing points before rendering
             double yPos = CellSize/2;  // Initialize yPos for the first row
 
-            for (int y = 0; y < Rows; y++) {
+            for (uint y = 0; y < NumRows; y++) {
                 double xPos = CellSize/2;  // Initialize xPos for each row
 
-                for (int x = 0; x < Cols; x++) {
+                for (uint x = 0; x < NumCols; x++) {
                     // Create a new Point at the current position
-                    Point point = new Point(xPos, yPos);
+                    Point point = new Point(xPos, yPos, x, y);
                     points.Add(point);
 
                     // Draw the dot at the position
@@ -90,19 +92,19 @@ public partial class MainWindowClass : Window
 
             // Draw horizontal and vertical lines at the top, bottom, left, and right
             Position topStart = new Position(0, CellSize);
-            Position topEnd = new Position(Cols * CellSize, CellSize);
+            Position topEnd = new Position(NumCols * CellSize, CellSize);
             DrawLine(topStart, topEnd, Brushes.Red, 1);
 
-            Position bottomStart = new Position(0, (Rows - 1) * CellSize);
-            Position bottomEnd = new Position(Cols * CellSize, (Rows - 1) * CellSize);
+            Position bottomStart = new Position(0, (NumRows - 1) * CellSize);
+            Position bottomEnd = new Position(NumCols * CellSize, (NumRows - 1) * CellSize);
             DrawLine(bottomStart, bottomEnd, Brushes.Red, 1);
 
             Position leftStart = new Position(CellSize, 0);
-            Position leftEnd = new Position(CellSize, Rows * CellSize);
+            Position leftEnd = new Position(CellSize, NumRows * CellSize);
             DrawLine(leftStart, leftEnd, Brushes.Black, 1);
 
-            Position rightStart = new Position((Cols-1) * CellSize, 0);
-            Position rightEnd = new Position((Cols-1) * CellSize, Rows * CellSize);
+            Position rightStart = new Position((NumCols-1) * CellSize, 0);
+            Position rightEnd = new Position((NumCols-1) * CellSize, NumRows * CellSize);
             DrawLine(rightStart, rightEnd, Brushes.Black, 1);
         }
 
@@ -120,6 +122,7 @@ public partial class MainWindowClass : Window
 
             return line;
         }
+        
         private void Render() {
             // Clear any previous points from the canvas
             foreach (UIElement uiElement in Effects) {
@@ -146,7 +149,7 @@ public partial class MainWindowClass : Window
         private void SelectPoint(Position position) {
             // Find the closest point within the grid
 
-            Point? closestPoint = points.MinBy(p => p.Location.DistanceTo(position));
+            Point? closestPoint = points.MinBy(p => p.DistanceTo(position));
 
             if (closestPoint != null && SelectedPoint != closestPoint) {
                 if (SelectedPoint != null) {

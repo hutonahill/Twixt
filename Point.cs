@@ -1,31 +1,51 @@
-﻿using System.DirectoryServices.ActiveDirectory;
+﻿
+using System.Diagnostics;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Newtonsoft.Json;
 using TwixtCode;
 
 namespace Twixt;
 
 public class Point {
-    public Position Location { get; private set; }
-
+    private Position Location;
+    
+    [JsonIgnore]
     private const double DotSize = 5;
+    [JsonIgnore]
     private const double SelectedModifier = 1.5;
-
+    
+    [JsonIgnore]
     private Ellipse? element;
-
+    
+    [JsonIgnore]
     private Ellipse? effect;
 
     public Point(Position location) {
         Location = location;
     }
 
-    public Point(double x, double y) {
-        Location = new Position(x, y);
+    public Point(double x, double y, uint row, uint column) {
+        Location = new Position(x, y, row, column);
     }
 
     public double getSize() {
         return DotSize;
+    }
+
+    public uint getRow() {
+        if (Location.Row == null) {
+            throw new UnreachableException("Point always defines row");
+        }
+        return (uint)Location.Row;
+    }
+    
+    public uint getColumn() {
+        if (Location.Column == null) {
+            throw new UnreachableException("Point always defines column");
+        }
+        return (uint)Location.Column;
     }
 
     public Ellipse getElement() {
@@ -57,6 +77,14 @@ public class Point {
         }
         
         return effect;
+    }
+
+    public double DistanceTo(Position position) {
+        return Location.DistanceTo(position);
+    }
+
+    public double DistanceTo(Point point) {
+        return Location.DistanceTo(point.Location);
     }
 }
     

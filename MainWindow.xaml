@@ -1,6 +1,6 @@
 ﻿
 
-<Window x:Class="Twixt.MainWindowClass"
+<Window x:Class="Twixt.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Board in Box" Height="1000" Width="1000">

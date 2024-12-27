@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Twixt")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cd2b6742d3328b813c4c8f623e8a2f84b0b18cb1")]
 [assembly: System.Reflection.AssemblyProductAttribute("Twixt")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Twixt")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

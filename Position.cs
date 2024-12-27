@@ -1,14 +1,40 @@
-﻿namespace TwixtCode;
+﻿using System.Text.Json.Serialization;
+using Twixt;
+
+namespace TwixtCode;
 
 using System;
 
 public class Position {
-    public double X { get; }
-    public double Y { get; }
+    [JsonIgnore]
+    public double X { get; private set; }
+    
+    [JsonIgnore]
+    public double Y { get; private set; }
+    
+    public uint? Column { get; private set; }
+    public uint? Row { get; private set; }
 
     public Position(double x, double y) {
         X = x;
         Y = y;
+    }
+
+    public Position(double x, double y, uint row, uint column) {
+        X = x;
+        Y = y;
+
+        if (row > MainWindow.NumRows) {
+            throw new ArgumentOutOfRangeException(nameof(row), "Row position may not exceed number of rows");
+        }
+
+        if (column > MainWindow.NumCols) {
+            throw new ArgumentOutOfRangeException(nameof(column),
+                "Column Position may not exceed the number of columns");
+        }
+        
+        Row = row;
+        Column = column;
     }
 
     public double DistanceTo(Position other) {
@@ -22,3 +48,4 @@ public class Position {
         return $"({X}, {Y})";
     }
 }
+
