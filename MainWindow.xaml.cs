@@ -43,8 +43,15 @@ public partial class MainWindow : Window
             DrawGrid();
         }
 
-        public Point? getPoint(int row, int column) {
-            return points.FirstOrDefault(p => p.getRow() == row && p.getColumn() == column);
+        public Point getPoint(uint row, uint column) {
+            
+            Point? output = points.FirstOrDefault(p => p.getRow() == row && p.getColumn() == column);
+
+            if (output == null) {
+                throw new ArgumentException($"No point found at the specified location: Row {row}, Column {column}.");
+            }
+
+            return output;
         }
         
         private void Timer_Tick(object? sender, EventArgs e)

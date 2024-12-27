@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using TwixtCode;
 
 namespace Twixt;
@@ -23,12 +24,65 @@ public class Point {
     private Ellipse? effect;
 
     public Point(Position location) {
+        if (location.Row == null) {
+            throw new ArgumentNullException($"{nameof(location)}.{nameof(Position.Row)}", 
+                "Points need to have a row.");
+        }
+        
+        if (location.Column == null) {
+            throw new ArgumentNullException($"{nameof(location)}.{nameof(Position.Column)}", 
+                "Points need to have a column.");
+        }
+        
         Location = location;
     }
 
     public Point(double x, double y, uint row, uint column) {
         Location = new Position(x, y, row, column);
     }
+
+    public static Point GetPointFromBoard(JObject data, MainWindow board) {
+        if (!data.TryGetValue(nameof(Position.Row), out JToken? rowToken)) {
+            throw new ArgumentException($"Expected JObject to contain key {nameof(Position.Row)}.", nameof(data));
+        }
+        
+        if (rowToken.Type != JTokenType.Integer) {
+            throw new ArgumentException($"{nameof(data)}[{nameof(Position.Row)}] should be an JTokenType.Integer, " +
+                                        $"but is a JTokenType.{rowToken.Type}", nameof(data));
+        }
+
+        int rawRow = rowToken.Value<int>();
+
+        if (rawRow < 0) {
+            throw new ArgumentException($"expected a positive integer at {nameof(data)}[{nameof(Position.Row)}]," + 
+                                        $"but got a negative value", $"{nameof(data)}[{nameof(Position.Row)}]");
+        }
+
+        uint row = (uint)rawRow;
+        
+        
+        if (!data.TryGetValue(nameof(Position.Column), out JToken? columnToken)) {
+            throw new ArgumentException($"Expected JObject to contain key {nameof(Position.Column)}.", nameof(data));
+        }
+
+        if (columnToken.Type != JTokenType.Integer) {
+            throw new ArgumentException($"{nameof(data)}[{nameof(Position.Column)}] should be a JTokenType.Integer, " +
+                                        $"but is a JTokenType.{columnToken.Type}", nameof(data));
+        }
+
+        int rawColumn = columnToken.Value<int>();
+
+        if (rawColumn < 0) {
+            throw new ArgumentException($"Expected a positive integer at {nameof(data)}[{nameof(Position.Column)}], " +
+                                        $"but got a negative value.", $"{nameof(data)}[{nameof(Position.Column)}]");
+        }
+
+        uint column = (uint)rawColumn;
+
+        return board.getPoint(row, column);
+    }
+    
+    
 
     public double getSize() {
         return DotSize;
@@ -85,6 +139,13 @@ public class Point {
 
     public double DistanceTo(Point point) {
         return Location.DistanceTo(point.Location);
+    }
+
+    public JObject ToJson() {
+        return new JObject {
+            { nameof(Position.Row), Location.Row },
+            { nameof(Position.Column), Location.Column }
+        };
     }
 }
     
